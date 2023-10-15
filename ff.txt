@@ -1,0 +1,20 @@
+all:  
+  hosts:
+    host1.example.com: 
+      ansible_host: 192.168.1.1  
+      ansible_user: user1 
+      ansible_ssh_pass: password1  
+    host2.example.com:
+      ansible_host: 192.168.1.2
+      ansible_user: user2
+      ansible_ssh_pass: password2
+
+  children:  # You can define groups of hosts
+    web_servers:
+      hosts:
+        web1.example.com:
+        web2.example.com:
+    db_servers:
+      hosts:
+        db1.example.com:
+        db2.example.com:
