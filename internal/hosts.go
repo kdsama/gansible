@@ -48,7 +48,7 @@ type Inventory struct {
 	} `yaml:"all"`
 }
 
-func New() {
+func New() *MainInventory {
 	// We need to check in Command line, Current Directory and and default location
 	// and merge all of them.
 	mainInv := MainInventory{}
@@ -68,7 +68,7 @@ func New() {
 		var inventory Inventory
 		err = yaml.Unmarshal(yamlData, &inventory)
 		if err != nil {
-			return
+			log.Fatal(err)
 		}
 		if mainInv.inv == nil {
 			mainInv.inv = &inventory
@@ -88,10 +88,35 @@ func New() {
 		}
 
 	}
-	fmt.Println(mainInv.inv.All.Hosts)
+	mainInv.Validate()
+	return &mainInv
 	// Unmarshal the YAML into the Go struct
+}
 
-	// You can now work with the 'inventory' struct as needed
-	// validate for cyclic dependency
+func (mv *MainInventory) Validate() {
+	// We need to check if there is any cyclic dependency in children
+	// There cant be one in hosts
 
+	visited := map[string]struct{}{}
+
+	var dfs func(node string) bool
+	dfs = func(node string) bool {
+		if _, ok := visited[node]; ok {
+			return false
+		}
+		visited[node] = struct{}{}
+		for k, _ := range mv.inv.All.Children[node].Hosts {
+			if !dfs(k) {
+				log.Fatal("cyclic dependency found at child: ", k)
+			}
+		}
+		return true
+	}
+	for k, _ := range mv.inv.All.Children {
+		visited = map[string]struct{}{}
+		dfs(k)
+
+	}
+	fmt.Println(mv.inv.All.Children)
+	// Have to visualise better for the cyclic dependency on the children here
 }
