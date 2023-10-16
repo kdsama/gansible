@@ -1,80 +1,85 @@
 package main
 
-import (
-	"bytes"
-	"fmt"
+import "github.com/kdsama/gansible/internal"
 
-	"github.com/kdsama/gansible/internal"
-	"golang.org/x/crypto/ssh"
-	// "golang.org/x/crypto/ssh"
-)
+// Going to test out Os related information here
 
 func main() {
-	internal.New()
-	return
-	// Replace these with your own SSH credentials
+
+	// THese are the cli commands that we need to use
+	// cat
+	// port := 22
+	hosts := []string{"localhost"}
 	username := "kshitij"
 	password := "admin@123"
-	host := "localhost"
-	port := 22
+	internal.NewLogin(hosts[0], username, password, "")
+	// wg := sync.WaitGroup{}
+	// wg.Add(1)
+	// for _, host := range hosts {
 
-	// Create an SSH configuration
-	config := &ssh.ClientConfig{
-		User: username,
-		Auth: []ssh.AuthMethod{
-			ssh.Password(password),
-		},
-		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
-	}
+	// 	// host := "127.0.0.1"
 
-	// Connect to the SSH server
-	client, err := ssh.Dial("tcp", fmt.Sprintf("%s:%d", host, port), config)
-	if err != nil {
-		fmt.Println("Failed to dial:", err)
-		return
-	}
-	defer client.Close()
+	// 	// Create an SSH configuration
+	// 	go func(host string) {
+	// 		defer wg.Done()
+	// 		config := &ssh.ClientConfig{
+	// 			User: username,
+	// 			Auth: []ssh.AuthMethod{
+	// 				ssh.Password(password),
+	// 			},
+	// 			HostKeyCallback: ssh.InsecureIgnoreHostKey(),
+	// 		}
 
-	cmds := []string{"ls -l", "cat lam.txt", "lasd", "pwd"}
-	if err != nil {
-		panic(err)
-	}
+	// 		// Connect to the SSH server
+	// 		client, err := ssh.Dial("tcp", fmt.Sprintf("%s:%d", host, port), config)
+	// 		if err != nil {
+	// 			fmt.Println("Failed to dial:", err)
+	// 			return
+	// 		}
+	// 		defer client.Close()
 
-	ll := make([]byte, 20)
-	mm := make([]byte, 20)
-	sshOut := bytes.NewBuffer(ll)
-	sshErr := bytes.NewBuffer(mm)
-	type cmdOutput struct {
-		In  string
-		Out string
-		Err string
-	}
-	cmdOutputs := []cmdOutput{}
-	// session.Stdout = sshOut
-	var session *ssh.Session
-	for _, cmd := range cmds {
-		// Create a session
-		session, err = client.NewSession()
-		defer session.Close()
-		if err != nil {
+	// 		cmds := []string{"env", "ls"}
+	// 		if err != nil {
+	// 			panic(err)
+	// 		}
 
-			return
-		}
-		session.Stdout = sshOut
-		session.Stderr = sshErr
+	// 		ll := make([]byte, 20)
+	// 		mm := make([]byte, 20)
+	// 		sshOut := bytes.NewBuffer(ll)
+	// 		sshErr := bytes.NewBuffer(mm)
+	// 		type cmdOutput struct {
+	// 			In  string
+	// 			Out string
+	// 			Err string
+	// 		}
+	// 		cmdOutputs := []cmdOutput{}
+	// 		// session.Stdout = sshOut
+	// 		var session *ssh.Session
+	// 		for _, cmd := range cmds {
+	// 			// Create a session
+	// 			session, err = client.NewSession()
+	// 			defer session.Close()
+	// 			if err != nil {
 
-		session.Run(cmd)
+	// 				return
+	// 			}
+	// 			session.Stdout = sshOut
+	// 			session.Stderr = sshErr
 
-		co := cmdOutput{
-			Out: sshOut.String(),
-			Err: sshErr.String(),
-		}
-		cmdOutputs = append(cmdOutputs, co)
+	// 			session.Run(cmd)
 
-		sshOut.Truncate(0)
-		sshErr.Truncate(0)
+	// 			co := cmdOutput{
+	// 				Out: sshOut.String(),
+	// 				Err: sshErr.String(),
+	// 			}
+	// 			cmdOutputs = append(cmdOutputs, co)
 
-	}
-	fmt.Printf("%v", cmdOutputs)
+	// 			sshOut.Truncate(0)
+	// 			sshErr.Truncate(0)
 
+	// 		}
+	// 		fmt.Println(cmdOutputs[0].Out)
+	// 	}(host)
+	// }
+	// wg.Wait()
 }
