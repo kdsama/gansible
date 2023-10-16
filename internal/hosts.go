@@ -1,7 +1,6 @@
 package internal
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"strings"
@@ -115,8 +114,6 @@ func (mv *MainInventory) Validate() {
 	for k, _ := range mv.inv.All.Children {
 		visited = map[string]struct{}{}
 		dfs(k)
-
 	}
-	fmt.Println(mv.inv.All.Children)
 	// Have to visualise better for the cyclic dependency on the children here
 }
