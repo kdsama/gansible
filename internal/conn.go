@@ -9,14 +9,15 @@ import (
 )
 
 type Login struct {
-	host string
-	user string
-	pw   string
-	pkey string
+	host   string
+	user   string
+	pw     string
+	pkey   string
+	client *ssh.Client
 	// protocol Protocol
 }
 
-func NewLogin(host, user, pw, pkey string) *Login {
+func NewLogin(host, user, pw, pkey string) *ssh.Client {
 	lg := &Login{
 		host: host,
 		user: user,
@@ -24,11 +25,12 @@ func NewLogin(host, user, pw, pkey string) *Login {
 		pkey: pkey,
 		// protocol: pr,
 	}
-	lg.Ping()
-	return lg
+	client := lg.Ping()
+	lg.client = client
+	return client
 }
 
-func (lg *Login) Ping() {
+func (lg *Login) Ping() *ssh.Client {
 	config := &ssh.ClientConfig{
 		User: lg.user,
 		Auth: []ssh.AuthMethod{
@@ -47,5 +49,5 @@ func (lg *Login) Ping() {
 	}
 	d := color.New(color.FgCyan, color.Bold)
 	d.Println("Successful Connection")
-	client.Close()
+	return client
 }
