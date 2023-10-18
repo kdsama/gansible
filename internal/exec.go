@@ -24,6 +24,7 @@ func execute(client *ssh.Client, cmd string) ExecOutput {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	defer session.Close()
 
 	if err != nil {
