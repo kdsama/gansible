@@ -39,10 +39,7 @@ func NewLineInFile(task map[string]interface{}) (string, error) {
 
 		return str, nil
 	}
-	if _, ok := task["append"]; !ok {
-		return "", fmt.Errorf("%s %w", "append", ErrNotFound)
-	}
-	query = fmt.Sprintf("%s >> %s", task["line"].(string), path)
+	query = fmt.Sprintf("echo \"%s\" >> %s", task["line"].(string), path)
 	if _, ok := task["group"]; ok {
 		group = task["group"].(string)
 	}
