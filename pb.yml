@@ -8,6 +8,10 @@
         path: /path/to/your/file.txt
         line: 'Your desired line here'
         append: yes  
+        owner: test
+        group: somegroup
+        mod: "0644"
+        
 
     - name: Ensure a line is present in a file
       lineinfile:
