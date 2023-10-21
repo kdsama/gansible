@@ -1,0 +1,2 @@
+db_and_web_server ansible_connection=ssh ansible_ssh_pass=secret_password ansible_host=127.0.0.1 ansible_ssh_user=test ansible_host_port=2222
+

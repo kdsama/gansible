@@ -8,27 +8,6 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// all:  # This is the top-level group, which contains all hosts
-//   hosts:
-//     host1.example.com:  # Individual host
-//       ansible_host: 192.168.1.1  # IP address or hostname
-//       ansible_user: user1  # SSH username
-//       ansible_ssh_pass: password1  # SSH password (not recommended, use SSH keys)
-//     host2.example.com:
-//       ansible_host: 192.168.1.2
-//       ansible_user: user2
-//       ansible_ssh_pass: password2
-
-//   children:  # You can define groups of hosts
-//     web_servers:
-//       hosts:
-//         web1.example.com:
-//         web2.example.com:
-//     db_servers:
-//       hosts:
-//         db1.example.com:
-//         db2.example.com:
-
 type Host struct {
 	AnsibleHost    string `yaml:"ansible_host"`
 	AnsibleUser    string `yaml:"ansible_user"`
@@ -59,13 +38,13 @@ func New() *MainInventory {
 		if strings.Trim(inv, " ") == "" {
 			continue
 		}
-		yamlData, err := os.ReadFile(inv)
+		yamlData, _ := os.ReadFile(inv)
 
-		if err != nil {
-			log.Println(err)
-		}
+		// if err != nil {
+		// 	log.Println(err)
+		// }
 		var inventory Inventory
-		err = yaml.Unmarshal(yamlData, &inventory)
+		err := yaml.Unmarshal(yamlData, &inventory)
 		if err != nil {
 			log.Fatal(err)
 		}

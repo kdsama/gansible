@@ -1,0 +1,30 @@
+---
+- name: example playbook
+  hosts: localhost
+
+  tasks:
+    - name: Ensure a line is present in a file
+      lineinfile:
+        path: /path/to/your/file.txt
+        line: 'Your desired line here'
+        create: yes  
+      
+    - name: Copy a file to remote hosts
+      copy:
+        src: /path/to/local/source/file.txt
+        dest: /path/to/remote/destination/file.txt
+     
+
+    - name: Create a group
+      group:
+        name: yourgroup
+        state: present  
+      
+    - name: Create a user
+      user:
+        name: yourusername
+        password: yourpassword  
+        groups: yourgroup    
+        state: present       
+        shell: /bin/bash     
+      

@@ -4,8 +4,7 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
-var factList = []string{"env", "arch", "cat /proc/cpuinfo", "cat /proc/cmdline", "groups", "whoami",
-	"id -g", "id -u", "df -h / | awk '{print $3, $4}' ", "free -h| awk '{print $3, $4}' "}
+var factList = []string{"/bin/bash -ic '/usr/bin/env'"}
 
 func GetFacts(client *ssh.Client) *[]ExecOutput {
 
