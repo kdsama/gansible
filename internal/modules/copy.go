@@ -7,6 +7,15 @@ import (
 )
 
 func NewCopy(task map[string]interface{}) string {
+	// We need to do a remote copy
+	// Without breaking the barrier
+	// Can it just be done using commandline ?
+
+	return "Hi"
+}
+
+// This is for copy from one place to another within remote. Not required
+func newCopy(task map[string]interface{}) string {
 	constraints := []string{"src", "dest"}
 	for _, c := range constraints {
 		if _, ok := task[c]; !ok {

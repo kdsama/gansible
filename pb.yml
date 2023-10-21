@@ -7,12 +7,21 @@
       lineinfile:
         path: /path/to/your/file.txt
         line: 'Your desired line here'
-        create: yes  
-      
+        append: yes  
+
+    - name: Ensure a line is present in a file
+      lineinfile:
+        path: /path/to/your/file.txt
+        line: 'Your desired line here'
+        state: present
+
+
+
     - name: Copy a file to remote hosts
       copy:
         src: /path/to/local/source/file.txt
         dest: /path/to/remote/destination/file.txt
+        
      
 
     - name: Create a group
