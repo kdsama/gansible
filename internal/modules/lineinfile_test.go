@@ -7,6 +7,7 @@ import (
 )
 
 func TestNewLineInFile(t *testing.T) {
+	t.Parallel()
 	type testcase struct {
 		input map[string]interface{}
 		want  string
@@ -112,7 +113,7 @@ func TestNewLineInFile(t *testing.T) {
 }
 
 func TestNewLineInFileErrors(t *testing.T) {
-
+	t.Parallel()
 	type testcase struct {
 		input map[string]interface{}
 		want  error

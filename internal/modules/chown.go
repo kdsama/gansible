@@ -11,5 +11,6 @@ func NewOwner(owner, group string, file string) string {
 	if group != "" {
 		str += fmt.Sprintf(":%s", group)
 	}
+
 	return fmt.Sprintf("chown %s %s", str, file)
 }
