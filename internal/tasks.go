@@ -14,7 +14,7 @@ func parseTask(task map[string]interface{}) string {
 		case "copy":
 			res = modules.NewCopy(task[key].(map[string]interface{}))
 		case "lineinfile":
-			res = modules.NewLineInFile(task[key].(map[string]interface{}))
+			res, _ = modules.NewLineInFile(task[key].(map[string]interface{}))
 		default:
 			fmt.Println("Yeah its fine for now")
 		}
