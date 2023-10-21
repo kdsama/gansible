@@ -1,11 +1,16 @@
 package modules
 
 import (
+	"errors"
 	"fmt"
-	"log"
 )
 
-func NewLineInFile(task map[string]interface{}) string {
+var (
+	ErrNotFound     = errors.New("not found")
+	ErrInvalidInput = errors.New("invalid input")
+)
+
+func NewLineInFile(task map[string]interface{}) (string, error) {
 
 	var (
 		constraints = []string{"path", "line"}
@@ -17,14 +22,14 @@ func NewLineInFile(task map[string]interface{}) string {
 
 	for _, k := range constraints {
 		if _, ok := task[k]; !ok {
-			log.Fatal("Damn it where is ", k)
+			return "", fmt.Errorf("%s %w", k, ErrNotFound)
 		}
 	}
 	path = task["path"].(string)
 	if _, ok := task["state"]; ok {
 		var str string
 		if task["state"] != "present" && task["state"] != "absent" {
-			log.Fatal("Invalid input : ", task["state"])
+			return "", fmt.Errorf("%w for %s", ErrInvalidInput, "state")
 		}
 
 		str = fmt.Sprintf("if grep -q %s %s; then echo 'true'; else echo 'false'; fi", task["line"].(string), path)
@@ -32,10 +37,10 @@ func NewLineInFile(task map[string]interface{}) string {
 			str = fmt.Sprintf("if grep -q %s %s; then echo 'false'; else echo 'true'; fi", task["line"].(string), path)
 		}
 
-		return str
+		return str, nil
 	}
 	if _, ok := task["append"]; !ok {
-		log.Fatal("Expected append function")
+		return "", fmt.Errorf("%s %w", "append", ErrNotFound)
 	}
 	query = fmt.Sprintf("%s >> %s", task["line"].(string), path)
 	if _, ok := task["group"]; ok {
@@ -53,6 +58,6 @@ func NewLineInFile(task map[string]interface{}) string {
 		ns := NewMode(task["mod"].(string), path)
 		query = fmt.Sprintf("%s && %s", query, ns)
 	}
-	return query
+	return query, nil
 
 }
