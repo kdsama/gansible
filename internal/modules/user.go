@@ -25,18 +25,20 @@ func NewUser(userMap map[string]interface{}) (string, error) {
 		return "", fmt.Errorf("name %w", ErrNotFound)
 	}
 	name = userMap["name"].(string)
-	if _, ok := userMap["name"]; !ok {
-		if _, ok := userMap["remove"]; ok {
-			if userMap["remove"].(bool) {
-				return fmt.Sprintf("userdel -r %s", name), nil
-			}
+	if _, ok := userMap["remove"]; ok {
+		if userMap["remove"].(bool) {
+			return fmt.Sprintf("userdel -r %s", name), nil
 		}
 	}
 
 	if _, ok := userMap["state"]; !ok {
 		state = true
 	} else {
-		state = userMap["state"].(bool)
+		if userMap["state"].(string) == "absent" {
+			state = false
+		} else {
+			state = true
+		}
 	}
 	if state {
 		str = fmt.Sprintf("sudo useradd  %s || sudo passwd -u %s", name, name)

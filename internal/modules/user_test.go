@@ -68,3 +68,53 @@ func TestNewUserErrors(t *testing.T) {
 
 	}
 }
+
+func TestNewUser(t *testing.T) {
+
+	testMap := map[string]struct {
+		input map[string]interface{}
+		want  string
+	}{
+		"remove user": {
+			input: map[string]interface{}{
+				"name":   "kd",
+				"remove": true,
+			},
+			want: fmt.Sprintf("userdel -r %s", "kd"),
+		},
+		"lock user": {
+			input: map[string]interface{}{
+				"name":  "kd",
+				"state": "absent",
+			},
+			want: fmt.Sprintf("passwd -l %s", "kd"),
+		},
+		"add user, without home directory": {
+			input: map[string]interface{}{
+				"name":  "kd",
+				"state": "present",
+			},
+			want: fmt.Sprintf("sudo useradd  %s || sudo passwd -u %s", "kd", "kd"),
+		},
+		"add user and home directory": {
+			input: map[string]interface{}{
+				"name":        "kd",
+				"state":       "present",
+				"create_home": true,
+			},
+			want: fmt.Sprintf("sudo useradd  %s || sudo passwd -u %s && mkdir /home/%s && chown %s:%s /home/%s", "kd", "kd", "kd", "kd", "kd", "kd"),
+		},
+	}
+	for name, obj := range testMap {
+		t.Run(name, func(t *testing.T) {
+			got, err := NewUser(obj.input)
+			if err != nil {
+				t.Errorf("expected nil but got error %v", err)
+			}
+			if obj.want != got {
+				t.Errorf("wanted %v but got %v", obj.want, got)
+			}
+		})
+
+	}
+}
