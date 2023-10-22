@@ -1,11 +1,12 @@
 package modules
 
 import (
+	"errors"
 	"fmt"
 	"testing"
 )
 
-func TestNewOwner(t *testing.T) {
+func TestNewFileOwner(t *testing.T) {
 
 	type testcase struct {
 		owner string
@@ -36,10 +37,34 @@ func TestNewOwner(t *testing.T) {
 	}
 	for name, obj := range testMap {
 		t.Run(name, func(t *testing.T) {
-			got := NewOwner(obj.owner, obj.group, obj.file)
+			got := NewFileOwner(obj.owner, obj.group, obj.file)
 			if obj.want != got {
 				t.Errorf("Wanted %v but got %v", obj.want, got)
 			}
 		})
+	}
+}
+
+func TestNewUserErrors(t *testing.T) {
+	testMap := map[string]struct {
+		input map[string]interface{}
+		want  error
+	}{
+		"name not present": {
+			input: map[string]interface{}{
+				"notpresent": "name",
+			},
+			want: ErrNotFound,
+		},
+	}
+
+	for name, obj := range testMap {
+		t.Run(name, func(t *testing.T) {
+			_, got := NewUser(obj.input)
+			if !errors.Is(got, obj.want) {
+				t.Errorf("wanted %v but got %v", obj.want, got)
+			}
+		})
+
 	}
 }

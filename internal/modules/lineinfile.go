@@ -47,7 +47,7 @@ func NewLineInFile(task map[string]interface{}) (string, error) {
 		owner = task["owner"].(string)
 	}
 	if owner != "" || group != "" {
-		ns := NewOwner(owner, group, path)
+		ns := NewFileOwner(owner, group, path)
 		query = fmt.Sprintf("%s && %s", query, ns)
 	}
 
