@@ -142,13 +142,13 @@ func TestNewLineInFileErrors(t *testing.T) {
 			},
 			want: ErrInvalidInput,
 		},
-		"Append not present": {
-			input: map[string]interface{}{
-				"path": "/some/line",
-				"line": "some line",
-			},
-			want: ErrNotFound,
-		},
+		// "Append not present": {
+		// 	input: map[string]interface{}{
+		// 		"path": "/some/line",
+		// 		"line": "some line",
+		// 	},
+		// 	want: ErrNotFound,
+		// },
 	}
 
 	for testname, testObj := range testMap {

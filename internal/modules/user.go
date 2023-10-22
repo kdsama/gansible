@@ -45,11 +45,16 @@ func NewUser(userMap map[string]interface{}) (string, error) {
 	} else {
 		str = fmt.Sprintf("passwd -l %s", name)
 	}
+
+	if _, ok := userMap["groups"]; ok {
+		str = fmt.Sprintf("%s && sudo usermod -aG %s %s", str, userMap["groups"].(string), name)
+	}
+
 	if val, ok := userMap["create_home"]; ok {
 		if val.(bool) {
 			str = fmt.Sprintf("%s && mkdir /home/%s && chown %s:%s /home/%s", str, name, name, name, name)
 		}
 	}
-
+	fmt.Println(str)
 	return str, nil
 }
