@@ -94,7 +94,7 @@ func TestNewUser(t *testing.T) {
 				"name":  "kd",
 				"state": "present",
 			},
-			want: fmt.Sprintf("sudo useradd  %s || sudo passwd -u %s", "kd", "kd"),
+			want: fmt.Sprintf(" useradd  %s ||  passwd -u %s", "kd", "kd"),
 		},
 		"add user and assign it groups": {
 			input: map[string]interface{}{
@@ -102,7 +102,7 @@ func TestNewUser(t *testing.T) {
 				"state":  "present",
 				"groups": "group1,group2",
 			},
-			want: fmt.Sprintf("sudo useradd  %s || sudo passwd -u %s && sudo usermod -aG %s %s", "kd", "kd", "group1,group2", "kd"),
+			want: fmt.Sprintf(" useradd  %s ||  passwd -u %s &&  usermod -aG %s %s", "kd", "kd", "group1,group2", "kd"),
 		},
 		"add user and home directory": {
 			input: map[string]interface{}{
@@ -110,7 +110,7 @@ func TestNewUser(t *testing.T) {
 				"state":       "present",
 				"create_home": true,
 			},
-			want: fmt.Sprintf("sudo useradd  %s || sudo passwd -u %s && mkdir /home/%s && chown %s:%s /home/%s", "kd", "kd", "kd", "kd", "kd", "kd"),
+			want: fmt.Sprintf(" useradd  %s ||  passwd -u %s && mkdir /home/%s && chown %s:%s /home/%s", "kd", "kd", "kd", "kd", "kd", "kd"),
 		},
 	}
 	for name, obj := range testMap {

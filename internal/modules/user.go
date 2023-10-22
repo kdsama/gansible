@@ -41,13 +41,13 @@ func NewUser(userMap map[string]interface{}) (string, error) {
 		}
 	}
 	if state {
-		str = fmt.Sprintf("sudo useradd  %s || sudo passwd -u %s", name, name)
+		str = fmt.Sprintf(" useradd  %s ||  passwd -u %s", name, name)
 	} else {
 		str = fmt.Sprintf("passwd -l %s", name)
 	}
 
 	if _, ok := userMap["groups"]; ok {
-		str = fmt.Sprintf("%s && sudo usermod -aG %s %s", str, userMap["groups"].(string), name)
+		str = fmt.Sprintf("%s &&  usermod -aG %s %s", str, userMap["groups"].(string), name)
 	}
 
 	if val, ok := userMap["create_home"]; ok {
