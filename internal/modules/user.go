@@ -1,6 +1,9 @@
 package modules
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 func NewFileOwner(owner, group string, file string) string {
 	var str string
@@ -47,7 +50,12 @@ func NewUser(userMap map[string]interface{}) (string, error) {
 	}
 
 	if _, ok := userMap["groups"]; ok {
-		str = fmt.Sprintf("%s &&  usermod -aG %s %s", str, userMap["groups"].(string), name)
+		groups := strings.Split(userMap["groups"].(string), ",")
+		ns := fmt.Sprint(str)
+		for _, g := range groups {
+			ns = fmt.Sprintf("%s || groupadd %s", ns, g)
+		}
+		str = fmt.Sprintf("%s && usermod -aG %s %s", ns, userMap["groups"].(string), name)
 	}
 
 	if val, ok := userMap["create_home"]; ok {
