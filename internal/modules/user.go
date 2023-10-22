@@ -5,19 +5,6 @@ import (
 	"strings"
 )
 
-func NewFileOwner(owner, group string, file string) string {
-	var str string
-
-	if owner != "" {
-		str += owner
-	}
-	if group != "" {
-		str += fmt.Sprintf(":%s", group)
-	}
-
-	return fmt.Sprintf("chown %s %s", str, file)
-}
-
 func NewUser(userMap map[string]interface{}) (string, error) {
 	var (
 		str   string
@@ -63,6 +50,5 @@ func NewUser(userMap map[string]interface{}) (string, error) {
 			str = fmt.Sprintf("%s && mkdir /home/%s && chown %s:%s /home/%s", str, name, name, name, name)
 		}
 	}
-	fmt.Println(str)
 	return str, nil
 }

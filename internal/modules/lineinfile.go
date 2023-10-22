@@ -39,6 +39,8 @@ func NewLineInFile(task map[string]interface{}) (string, error) {
 
 		return str, nil
 	}
+
+	// TODO: move this to file.go as lineinfile does not change ownershup of the file
 	query = fmt.Sprintf("echo \"%s\" >> %s", task["line"].(string), path)
 	if _, ok := task["group"]; ok {
 		group = task["group"].(string)
@@ -47,12 +49,12 @@ func NewLineInFile(task map[string]interface{}) (string, error) {
 		owner = task["owner"].(string)
 	}
 	if owner != "" || group != "" {
-		ns := NewFileOwner(owner, group, path)
+		ns := modifyFileOwnership(owner, group, path)
 		query = fmt.Sprintf("%s && %s", query, ns)
 	}
 
 	if _, ok := task["mod"]; ok {
-		ns := NewMode(task["mod"].(string), path)
+		ns := modifyFileMode(task["mod"].(string), path)
 		query = fmt.Sprintf("%s && %s", query, ns)
 	}
 	return query, nil

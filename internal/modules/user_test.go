@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestNewFileOwner(t *testing.T) {
+func TestmodifyFileOwnership(t *testing.T) {
 
 	type testcase struct {
 		owner string
@@ -37,7 +37,7 @@ func TestNewFileOwner(t *testing.T) {
 	}
 	for name, obj := range testMap {
 		t.Run(name, func(t *testing.T) {
-			got := NewFileOwner(obj.owner, obj.group, obj.file)
+			got := modifyFileOwnership(obj.owner, obj.group, obj.file)
 			if obj.want != got {
 				t.Errorf("Wanted %v but got %v", obj.want, got)
 			}

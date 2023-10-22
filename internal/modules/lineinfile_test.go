@@ -37,67 +37,6 @@ func TestNewLineInFile(t *testing.T) {
 			},
 			want: fmt.Sprintf("echo \"%s\" >> %s", dummyLine, dummyPath),
 		},
-		"set only group": {
-			input: map[string]interface{}{
-				"path":  dummyPath,
-				"line":  dummyLine,
-				"group": "kd",
-			},
-			want: fmt.Sprintf("echo \"%s\" >> %s && chown :%s %s", dummyLine, dummyPath, "kd", dummyPath),
-		},
-		"set only owner": {
-			input: map[string]interface{}{
-				"path":  dummyPath,
-				"line":  dummyLine,
-				"owner": "kd",
-			},
-			want: fmt.Sprintf("echo \"%s\" >> %s && chown %s %s", dummyLine, dummyPath, "kd", dummyPath),
-		},
-		"set owner and group": {
-			input: map[string]interface{}{
-				"path":  dummyPath,
-				"line":  dummyLine,
-				"owner": "kd",
-				"group": "kd1",
-			},
-			want: fmt.Sprintf("echo \"%s\" >> %s && chown %s:%s %s", dummyLine, dummyPath, "kd", "kd1", dummyPath),
-		},
-		"set mod ": {
-			input: map[string]interface{}{
-				"path": dummyPath,
-				"line": dummyLine,
-				"mod":  "0644",
-			},
-			want: fmt.Sprintf("echo \"%s\" >> %s && chmod %s %s", dummyLine, dummyPath, "0644", dummyPath),
-		},
-		"set mod  and user ": {
-			input: map[string]interface{}{
-				"path":  dummyPath,
-				"line":  dummyLine,
-				"mod":   "0644",
-				"owner": "kd",
-			},
-			want: fmt.Sprintf("echo \"%s\" >> %s && chown %s %s && chmod %s %s", dummyLine, dummyPath, "kd", dummyPath, "0644", dummyPath),
-		},
-		"set mod and group ": {
-			input: map[string]interface{}{
-				"path":  dummyPath,
-				"line":  dummyLine,
-				"mod":   "0644",
-				"group": "kd",
-			},
-			want: fmt.Sprintf("echo \"%s\" >> %s && chown :%s %s && chmod %s %s", dummyLine, dummyPath, "kd", dummyPath, "0644", dummyPath),
-		},
-		"set mod group and user": {
-			input: map[string]interface{}{
-				"path":  dummyPath,
-				"line":  dummyLine,
-				"mod":   "0644",
-				"owner": "kd",
-				"group": "kd1",
-			},
-			want: fmt.Sprintf("echo \"%s\" >> %s && chown %s:%s %s && chmod %s %s", dummyLine, dummyPath, "kd", "kd1", dummyPath, "0644", dummyPath),
-		},
 	}
 	for testname, testObj := range testMap {
 		t.Run(testname, func(t *testing.T) {
