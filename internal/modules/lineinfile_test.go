@@ -10,7 +10,7 @@ func TestNewLineInFile(t *testing.T) {
 	t.Parallel()
 	type testcase struct {
 		input map[string]interface{}
-		want  string
+		want  []string
 	}
 	dummyPath, dummyLine := "/dummy/Path", "Hi this is dummyLine"
 	testMap := map[string]testcase{
@@ -20,7 +20,7 @@ func TestNewLineInFile(t *testing.T) {
 				"line":  dummyLine,
 				"state": "present",
 			},
-			want: fmt.Sprintf("if grep -q %s %s; then echo 'true'; else echo 'false'; fi", dummyLine, dummyPath),
+			want: []string{fmt.Sprintf("if grep -q %s %s; then echo 'true'; else echo 'false'; fi", dummyLine, dummyPath)},
 		},
 		"return true if the line is absent": {
 			input: map[string]interface{}{
@@ -28,14 +28,14 @@ func TestNewLineInFile(t *testing.T) {
 				"line":  dummyLine,
 				"state": "absent",
 			},
-			want: fmt.Sprintf("if grep -q %s %s; then echo 'false'; else echo 'true'; fi", dummyLine, dummyPath),
+			want: []string{fmt.Sprintf("if grep -q %s %s; then echo 'false'; else echo 'true'; fi", dummyLine, dummyPath)},
 		},
 		"Command line to add the line at the end of the file": {
 			input: map[string]interface{}{
 				"path": dummyPath,
 				"line": dummyLine,
 			},
-			want: fmt.Sprintf("echo \"%s\" >> %s", dummyLine, dummyPath),
+			want: []string{fmt.Sprintf("echo \"%s\" >> %s", dummyLine, dummyPath)},
 		},
 	}
 	for testname, testObj := range testMap {
@@ -44,7 +44,7 @@ func TestNewLineInFile(t *testing.T) {
 			if err != nil {
 				t.Error("Wanted an error but got nil")
 			}
-			if testObj.want != got {
+			if len(testObj.want) != len(got) || testObj.want[0] != got[0] {
 				t.Errorf("Wanted %v but got %v", testObj.want, got)
 			}
 		})
