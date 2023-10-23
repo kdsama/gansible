@@ -19,7 +19,7 @@ func TestNewFilePermissions(t *testing.T) {
 	dummyPath := "/some/dummy/path"
 	testMap := map[string]struct {
 		input map[string]interface{}
-		want  string
+		want  []string
 	}{
 		"set only group": {
 			input: map[string]interface{}{
@@ -27,14 +27,14 @@ func TestNewFilePermissions(t *testing.T) {
 
 				"group": "kd",
 			},
-			want: fmt.Sprintf("chown :%s %s", "kd", dummyPath),
+			want: []string{fmt.Sprintf("chown :%s %s", "kd", dummyPath)},
 		},
 		"set only owner": {
 			input: map[string]interface{}{
 				"path":  dummyPath,
 				"owner": "kd",
 			},
-			want: fmt.Sprintf("chown %s %s", "kd", dummyPath),
+			want: []string{fmt.Sprintf("chown %s %s", "kd", dummyPath)},
 		},
 		"set owner and group": {
 			input: map[string]interface{}{
@@ -42,14 +42,14 @@ func TestNewFilePermissions(t *testing.T) {
 				"owner": "kd",
 				"group": "kd1",
 			},
-			want: fmt.Sprintf("chown %s:%s %s", "kd", "kd1", dummyPath),
+			want: []string{fmt.Sprintf("chown %s:%s %s", "kd", "kd1", dummyPath)},
 		},
 		"set mod ": {
 			input: map[string]interface{}{
 				"path": dummyPath,
 				"mode": "0644",
 			},
-			want: fmt.Sprintf("chmod %s %s", "0644", dummyPath),
+			want: []string{fmt.Sprintf("chmod %s %s", "0644", dummyPath)},
 		},
 		"set mod  and user ": {
 			input: map[string]interface{}{
@@ -58,7 +58,7 @@ func TestNewFilePermissions(t *testing.T) {
 				"mode":  "0644",
 				"owner": "kd",
 			},
-			want: fmt.Sprintf("chown %s %s && chmod %s %s", "kd", dummyPath, "0644", dummyPath),
+			want: []string{fmt.Sprintf("chown %s %s", "kd", dummyPath), fmt.Sprintf("chmod %s %s", "0644", dummyPath)},
 		},
 		"set mod and group ": {
 			input: map[string]interface{}{
@@ -67,7 +67,7 @@ func TestNewFilePermissions(t *testing.T) {
 				"mode":  "0644",
 				"group": "kd",
 			},
-			want: fmt.Sprintf("chown :%s %s && chmod %s %s", "kd", dummyPath, "0644", dummyPath),
+			want: []string{fmt.Sprintf("chown :%s %s", "kd", dummyPath), fmt.Sprintf("chmod %s %s", "0644", dummyPath)},
 		},
 		"set mod group and user": {
 			input: map[string]interface{}{
@@ -77,7 +77,7 @@ func TestNewFilePermissions(t *testing.T) {
 				"owner": "kd",
 				"group": "kd1",
 			},
-			want: fmt.Sprintf("chown %s:%s %s && chmod %s %s", "kd", "kd1", dummyPath, "0644", dummyPath),
+			want: []string{fmt.Sprintf("chown %s:%s %s", "kd", "kd1", dummyPath), fmt.Sprintf("chmod %s %s", "0644", dummyPath)},
 		},
 	}
 
@@ -87,8 +87,14 @@ func TestNewFilePermissions(t *testing.T) {
 			if err != nil {
 				t.Error("Expected nil but got error ", err)
 			}
-			if got != obj.want {
-				t.Errorf("want %s but got %s", obj.want, got)
+			if len(got) != len(obj.want) {
+				t.Errorf("Expected %v but got %v", obj.want, got)
+
+			}
+			for i := range got {
+				if got[i] != obj.want[i] {
+					t.Errorf("wanted %v but got %v", got[i], obj.want[i])
+				}
 			}
 		})
 	}
