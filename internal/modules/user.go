@@ -5,19 +5,19 @@ import (
 	"strings"
 )
 
-func NewUser(userMap map[string]interface{}) (string, error) {
+func NewUser(userMap map[string]interface{}) ([]string, error) {
 	var (
-		str   string
-		name  string
-		state bool
+		result []string
+		name   string
+		state  bool
 	)
 	if _, ok := userMap["name"]; !ok {
-		return "", fmt.Errorf("name %w", ErrNotFound)
+		return result, fmt.Errorf("name %w", ErrNotFound)
 	}
 	name = userMap["name"].(string)
 	if _, ok := userMap["remove"]; ok {
 		if userMap["remove"].(bool) {
-			return fmt.Sprintf("userdel -r %s", name), nil
+			return []string{fmt.Sprintf("userdel -r %s", name)}, nil
 		}
 	}
 
@@ -31,24 +31,25 @@ func NewUser(userMap map[string]interface{}) (string, error) {
 		}
 	}
 	if state {
-		str = fmt.Sprintf(" useradd  %s ||  passwd -u %s", name, name)
+		result = append(result, fmt.Sprintf("useradd %s", name), fmt.Sprintf("passwd -u %s", name))
+
 	} else {
-		str = fmt.Sprintf("passwd -l %s", name)
+		result = append(result, fmt.Sprintf("passwd -l %s", name))
 	}
 
 	if _, ok := userMap["groups"]; ok {
 		groups := strings.Split(userMap["groups"].(string), ",")
-		ns := fmt.Sprint(str)
+
 		for _, g := range groups {
-			ns = fmt.Sprintf("%s || groupadd %s", ns, g)
+			result = append(result, fmt.Sprintf("groupadd %s", g))
 		}
-		str = fmt.Sprintf("%s && usermod -aG %s %s", ns, userMap["groups"].(string), name)
+		result = append(result, fmt.Sprintf("usermod -aG %s %s", userMap["groups"].(string), name))
 	}
 
 	if val, ok := userMap["create_home"]; ok {
 		if val.(bool) {
-			str = fmt.Sprintf("%s && mkdir /home/%s && chown %s:%s /home/%s", str, name, name, name, name)
+			result = append(result, fmt.Sprintf("mkdir /home/%s", name), fmt.Sprintf("chown %s:%s /home/%s", name, name, name))
 		}
 	}
-	return str, nil
+	return result, nil
 }

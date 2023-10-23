@@ -25,7 +25,7 @@ func NewPlaybook(playfile string) {
 	if e != nil {
 		log.Fatal(e)
 	}
-	taskArray := []string{}
+	taskArray := [][]string{}
 	for _, play := range pb {
 		for _, task := range play.Tasks {
 			result := parseTask(task)
