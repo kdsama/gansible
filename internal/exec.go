@@ -2,6 +2,7 @@ package internal
 
 import (
 	"bytes"
+	"fmt"
 	"log"
 	"os"
 
@@ -36,5 +37,6 @@ func execute(client *ssh.Client, cmd string) ExecOutput {
 		Err: sshErr.String(),
 		Cmd: cmd,
 	}
+	fmt.Println("Output is ", co.Out, ">>> ERROR ", co.Err)
 	return co
 }

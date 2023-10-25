@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	"gopkg.in/yaml.v3"
 )
@@ -43,7 +44,12 @@ func NewPlaybook(playbookPath string) *PlayBook {
 	}
 }
 
-func (pb *PlayBook) Generate(index int) {
+type Document struct {
+	hosts []string
+	tasks []*Task
+}
+
+func (pb *PlayBook) Generate(index int) Document {
 
 	// Here there is another mistake
 	// The task may or may not be appended according to module being used.
@@ -69,12 +75,18 @@ func (pb *PlayBook) Generate(index int) {
 	// Now there is another concern
 	// We would also have to return the hosts we must run this on
 	// Lets first gather everything
+	hosts := strings.Split(pb.Plays[index].Hosts, ",")
+	fn := []*Task{}
 	for _, task := range pb.Plays[index].Tasks {
 		t, err := parseTask(task)
-		if err != nil {
+		if err != nil || t == nil {
 			fmt.Printf("Error %v \n", err)
+			continue
 		}
-		fmt.Println(t)
+		fn = append(fn, t)
 	}
-
+	return Document{
+		hosts: hosts,
+		tasks: fn,
+	}
 }
