@@ -14,8 +14,11 @@ type Host struct {
 	AnsibleSshPass string `yaml:"ansible_ssh_pass"`
 }
 type MainInventory struct {
-	inv *Inventory
+	inv   *Inventory
+	paths []string
 }
+
+type InventoryOpts func(inv *MainInventory)
 
 type Inventory struct {
 	All struct {
@@ -26,15 +29,24 @@ type Inventory struct {
 	} `yaml:"all"`
 }
 
-func New() *MainInventory {
+func InventoryPathOptions(path string) InventoryOpts {
+	return func(inv *MainInventory) {
+		inv.paths = append(inv.paths, path)
+	}
+}
+
+func NewInventory(invOpts ...InventoryOpts) *MainInventory {
 	// We need to check in Command line, Current Directory and and default location
 	// and merge all of them.
 	mainInv := MainInventory{}
-
+	for _, opts := range invOpts {
+		opts(&mainInv)
+	}
+	// append the default path as well
+	mainInv.paths = append(mainInv.paths, "ff.yml")
 	// Argument, Current Folder and default
-	inventoryArr := []string{"", "./ff.txt", "./ff1.txt"}
 
-	for _, inv := range inventoryArr {
+	for _, inv := range mainInv.paths {
 		if strings.Trim(inv, " ") == "" {
 			continue
 		}

@@ -11,7 +11,11 @@ type Task struct {
 }
 
 func parseTask(task map[string]interface{}) ([]*Task, error) {
-
+	defer func() {
+		if err := recover(); err != nil {
+			fmt.Println(err)
+		}
+	}()
 	var result []*Task
 	for key, _ := range task {
 		switch key {

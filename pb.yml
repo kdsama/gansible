@@ -5,27 +5,19 @@
   tasks:
     - name: Ensure a line is present in a file
       lineinfile:
-        path: /path/to/your/file.txt
+        path: /home/kshitij/2x2_tic_tac_toe.pm
         line: 'Your desired line here'
-        owner: test
-        group: somegroup
+        owner: kshitij
+        group: kshitij
         mod: "0644"
         
 
     - name: Ensure a line is present in a file
       lineinfile:
-        path: /path/to/your/file.txt
+        path: /home/kshitij/2x2_tic_tac_toe.pm
         line: 'Your desired line here'
         state: present
 
-
-
-    - name: Copy a file to remote hosts
-      copy:
-        src: /path/to/local/source/file.txt
-        dest: /path/to/remote/destination/file.txt
-        
-     
 
     - name: Create a group
       group:

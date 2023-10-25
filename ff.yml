@@ -1,20 +1,7 @@
 all:  # This is the top-level group, which contains all hosts
   hosts:
-    host1.example.com:  # Individual host
-      ansible_host: 192.168.1.1  # IP address or hostname
-      ansible_user: user1  # SSH username
-      ansible_ssh_pass: password1  # SSH password (not recommended, use SSH keys)
-    host2.example.com:
-      ansible_host: 192.168.1.2
-      ansible_user: user2
-      ansible_ssh_pass: password2
+    localhost:  # Individual host
+      ansible_host: localhost  # IP address or hostname
+      ansible_user: kshitij  # SSH username
+      ansible_ssh_pass: admin@123  # SSH password (not recommended, use SSH keys)
 
-  children:  # You can define groups of hosts
-    web_servers:
-      hosts:
-        web1.example.com:
-        web2.example.com:
-    db_servers:
-      hosts:
-        db1.example.com:
-        db2.example.com:
