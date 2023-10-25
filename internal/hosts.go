@@ -12,6 +12,7 @@ type Host struct {
 	AnsibleHost    string `yaml:"ansible_host"`
 	AnsibleUser    string `yaml:"ansible_user"`
 	AnsibleSshPass string `yaml:"ansible_ssh_pass"`
+	AnsiblePort    int    `yaml:"ansible_ssh_port"`
 }
 type MainInventory struct {
 	inv   *Inventory
@@ -67,6 +68,7 @@ func NewInventory(invOpts ...InventoryOpts) *MainInventory {
 			for k, v := range inventory.All.Hosts {
 				if _, ok := mainInv.inv.All.Hosts[k]; !ok {
 					mainInv.inv.All.Hosts[k] = v
+
 				}
 			}
 			// Add Children keys as well

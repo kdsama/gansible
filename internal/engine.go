@@ -40,9 +40,11 @@ func (e *Engine) Run() {
 	wg := sync.WaitGroup{}
 	for i := range e.playbook.Plays {
 		respObj := e.playbook.Generate(i)
+		fmt.Println(respObj.hosts)
 		for _, h := range respObj.hosts {
 			obj := e.inventory.inv.All.Hosts[h]
-			cache[h] = NewLogin(obj.AnsibleHost, obj.AnsibleUser, obj.AnsibleSshPass, "")
+			fmt.Println("Obj is ", obj)
+			cache[h] = NewLogin(obj.AnsibleHost, obj.AnsibleUser, obj.AnsibleSshPass, "", obj.AnsiblePort)
 		}
 		for _, t := range respObj.tasks {
 			wg.Add(len(respObj.hosts))

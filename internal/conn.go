@@ -14,15 +14,21 @@ type Login struct {
 	pw     string
 	pkey   string
 	client *ssh.Client
+	port   int
 	// protocol Protocol
 }
 
-func NewLogin(host, user, pw, pkey string) *ssh.Client {
+func NewLogin(host, user, pw, pkey string, port int) *ssh.Client {
+	if port == 0 {
+		port = 22
+	}
+	fmt.Println("Port is", port)
 	lg := &Login{
 		host: host,
 		user: user,
 		pw:   pw,
 		pkey: pkey,
+		port: port,
 		// protocol: pr,
 	}
 	client := lg.Ping()
@@ -40,7 +46,7 @@ func (lg *Login) Ping() *ssh.Client {
 	}
 
 	// Connect to the SSH server
-	client, err := ssh.Dial("tcp", fmt.Sprintf("%s:%d", lg.host, 22), config)
+	client, err := ssh.Dial("tcp", fmt.Sprintf("%s:%d", lg.host, lg.port), config)
 	if err != nil {
 
 		d := color.New(color.FgRed)
