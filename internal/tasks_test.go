@@ -66,40 +66,41 @@ func TestParseTaskErrors(t *testing.T) {
 func TestParseTask(t *testing.T) {
 	dummyPath, dummyLine := "/dummy/Path", "Hi this is dummyLine"
 	testMap := map[string]struct {
-		input map[string]interface{}
+		input []map[string]interface{}
 		want  []*Task
 	}{
 		"lineinfile + user": {
-			input: map[string]interface{}{
-				"lineinfile": map[string]interface{}{
-					"path": dummyPath,
-					"line": dummyLine,
+			input: []map[string]interface{}{
+				{
+					"lineinfile": map[string]interface{}{
+						"path": dummyPath,
+						"line": dummyLine,
+					},
 				},
-				"user": map[string]interface{}{
-					"name":        "kd",
-					"state":       "present",
-					"create_home": true,
+				{
+					"user": map[string]interface{}{
+						"name":        "kd",
+						"state":       "present",
+						"create_home": true,
+					},
 				},
 			},
 			want: []*Task{
-				{[]string{fmt.Sprintf("echo \"%s\" >> %s", dummyLine, dummyPath)}},
-				{[]string{fmt.Sprintf("useradd %s", "kd"), fmt.Sprintf("passwd -u %s", "kd"), fmt.Sprintf("mkdir /home/%s", "kd"), fmt.Sprintf("chown %s:%s /home/%s", "kd", "kd", "kd")}},
+				{[]string{fmt.Sprintf("echo \"%s\" >> %s", dummyLine, dummyPath)}, "any"},
+				{[]string{fmt.Sprintf("useradd %s", "kd"), fmt.Sprintf("passwd -u %s", "kd"), fmt.Sprintf("mkdir /home/%s", "kd"), fmt.Sprintf("chown %s:%s /home/%s", "kd", "kd", "kd")}, "any"},
 			},
 		},
 	}
 	for name, obj := range testMap {
 		t.Run(name, func(t *testing.T) {
-			got, err := parseTask(obj.input)
-			if err != nil {
-				t.Errorf("Expected nil but got error %s", err.Error())
-			}
-			if len(got) != len(obj.want) {
-				t.Errorf("wanted %v but got %v", obj.want, got)
-			}
-			for i := range got {
-				for j := range got[i].cmds {
-					if got[i].cmds[j] != obj.want[i].cmds[j] {
-						t.Errorf("wanted %v but got %v", obj.want[i].cmds[j], got[i].cmds[j])
+			for j := 0; j < len(obj.input); j++ {
+				got, err := parseTask(obj.input[j])
+				if err != nil {
+					t.Errorf("Expected nil but got error %s", err.Error())
+				}
+				for i := range got.cmds {
+					if got.cmds[i] != obj.want[j].cmds[i] {
+						t.Errorf("wanted %v but got %v", obj.want[j].cmds[i], got.cmds[i])
 					}
 				}
 			}

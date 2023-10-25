@@ -27,8 +27,8 @@ func NewEngine(playbookPath string, hostPath string) *Engine {
 }
 
 func (e *Engine) Run() {
-
+	// os := "ubuntu"
 	for i := range e.playbook.Plays {
-		e.playbook.Run(i)
+		e.playbook.Generate(i)
 	}
 }
