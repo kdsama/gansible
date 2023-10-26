@@ -13,9 +13,10 @@ type PlayBook struct {
 }
 
 type Play struct {
-	Name  string                   `yaml:"name"`
-	Hosts string                   `yaml:"hosts"`
-	Tasks []map[string]interface{} `yaml:"tasks"`
+	Name     string                   `yaml:"name"`
+	Hosts    string                   `yaml:"hosts"`
+	Tasks    []map[string]interface{} `yaml:"tasks"`
+	Strategy string                   `yaml:"strategy"`
 }
 
 func NewPlaybook(playbookPath string) *PlayBook {

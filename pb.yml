@@ -1,7 +1,7 @@
 ---
 - name: example playbook
   hosts: localhost,brocode
-
+  strategy: free
   tasks:
     - name: Ensure a line is present in a file
       lineinfile:
