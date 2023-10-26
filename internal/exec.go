@@ -3,8 +3,8 @@ package internal
 import (
 	"bytes"
 	"log"
-
-	"golang.org/x/crypto/ssh"
+	"math/rand"
+	"time"
 )
 
 type ExecOutput struct {
@@ -13,13 +13,14 @@ type ExecOutput struct {
 	Err string
 }
 
-func execute(client *ssh.Client, cmd string) ExecOutput {
+func (sc *sshConn) execute(cmd string) ExecOutput {
 	ll := make([]byte, 0)
 	mm := make([]byte, 0)
+	time.Sleep(time.Duration(rand.Intn(200) * int(time.Millisecond)))
 	sshOut := bytes.NewBuffer(ll)
 	sshErr := bytes.NewBuffer(mm)
 
-	session, err := client.NewSession()
+	session, err := sc.client.NewSession()
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -1,12 +1,26 @@
 all:  # This is the top-level group, which contains all hosts
   hosts:
-    localhost:  # Individual host
-      ansible_host: localhost  # IP address or hostname
-      ansible_user: kshitij  # SSH username
-      ansible_ssh_pass: admin@123  # SSH password (not recommended, use SSH keys)
-    brocode:  # Individual host
+    # localhost:  # Individual host
+    #   ansible_host: localhost  # IP address or hostname
+    #   ansible_user: kshitij  # SSH username
+    #   ansible_ssh_pass: admin@123  # SSH password (not recommended, use SSH keys)
+    server1:  # Individual host
       ansible_host: localhost  # IP address or hostname
       ansible_user: root  # SSH username
       ansible_ssh_pass: Passw0rd  # SSH password (not recommended, use SSH keys)      
       ansible_ssh_port: 2222
-
+    server2:  # Individual host
+      ansible_host: localhost  # IP address or hostname
+      ansible_user: root  # SSH username
+      ansible_ssh_pass: Passw0rd  # SSH password (not recommended, use SSH keys)      
+      ansible_ssh_port: 2223     
+    server3:  # Individual host
+      ansible_host: localhost  # IP address or hostname
+      ansible_user: root  # SSH username
+      ansible_ssh_pass: Passw0rd  # SSH password (not recommended, use SSH keys)      
+      ansible_ssh_port: 2224
+    server4:  # Individual host
+      ansible_host: localhost  # IP address or hostname
+      ansible_user: root  # SSH username
+      ansible_ssh_pass: Passw0rd  # SSH password (not recommended, use SSH keys)      
+      ansible_ssh_port: 2225    

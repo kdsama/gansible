@@ -1,18 +1,14 @@
 package internal
 
-import (
-	"golang.org/x/crypto/ssh"
-)
-
 var factList = []string{"/bin/bash -ic '/usr/bin/env'"}
 
-func GetFacts(client *ssh.Client) *[]ExecOutput {
+func GetFacts(client *sshConn) *[]ExecOutput {
 
 	cmdOutputs := []ExecOutput{}
 
 	for _, cmd := range factList {
 		// Create a session
-		co := execute(client, cmd)
+		co := client.execute(cmd)
 		cmdOutputs = append(cmdOutputs, co)
 
 	}

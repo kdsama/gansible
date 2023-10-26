@@ -1,24 +1,8 @@
 ---
 - name: example playbook
-  hosts: localhost,brocode
+  hosts: server1,server2,server3,server4
   strategy: free
   tasks:
-    - name: Ensure a line is present in a file
-      lineinfile:
-        path: /home/kshitij/2x2_tic_tac_toe.pm
-        line: 'Your desired line here'
-        owner: kshitij
-        group: kshitij
-        mod: "0644"
-        
-
-    - name: Ensure a line is present in a file
-      lineinfile:
-        path: /home/kshitij/2x2_tic_tac_toe.pm
-        line: 'Your desired line here'
-        state: present
-
-
     - name: Create a group
       group:
         name: yourgroup

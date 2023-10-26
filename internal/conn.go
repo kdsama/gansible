@@ -8,7 +8,7 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
-type Login struct {
+type sshConn struct {
 	host   string
 	user   string
 	pw     string
@@ -18,12 +18,12 @@ type Login struct {
 	// protocol Protocol
 }
 
-func NewLogin(host, user, pw, pkey string, port int) *ssh.Client {
+func NewSshConn(host, user, pw, pkey string, port int) *sshConn {
 	if port == 0 {
 		port = 22
 	}
 	fmt.Println("Port is", port)
-	lg := &Login{
+	lg := &sshConn{
 		host: host,
 		user: user,
 		pw:   pw,
@@ -33,10 +33,10 @@ func NewLogin(host, user, pw, pkey string, port int) *ssh.Client {
 	}
 	client := lg.Ping()
 	lg.client = client
-	return client
+	return lg
 }
 
-func (lg *Login) Ping() *ssh.Client {
+func (lg *sshConn) Ping() *ssh.Client {
 	config := &ssh.ClientConfig{
 		User: lg.user,
 		Auth: []ssh.AuthMethod{
