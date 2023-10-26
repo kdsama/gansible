@@ -25,22 +25,22 @@ func NewFilePermissions(fileMap map[string]interface{}) ([]string, error) {
 		group  string
 		result []string
 	)
-	if _, ok := fileMap["path"]; !ok {
+	if _, ok := fileMap[pathParam]; !ok {
 		return result, fmt.Errorf("path %w", ErrNotFound)
 	}
-	path = fileMap["path"].(string)
-	if _, ok := fileMap["owner"]; ok {
-		owner = fileMap["owner"].(string)
+	path = fileMap[pathParam].(string)
+	if _, ok := fileMap[ownerParam]; ok {
+		owner = fileMap[ownerParam].(string)
 	}
-	if _, ok := fileMap["group"]; ok {
-		group = fileMap["group"].(string)
+	if _, ok := fileMap[groupParam]; ok {
+		group = fileMap[groupParam].(string)
 	}
 	if owner != "" || group != "" {
 		result = append(result, modifyFileOwnership(owner, group, path))
 	}
 
-	if _, ok := fileMap["mode"]; ok {
-		result = append(result, modifyFileMode(fileMap["mode"].(string), path))
+	if _, ok := fileMap[modeParam]; ok {
+		result = append(result, modifyFileMode(fileMap[modeParam].(string), path))
 	}
 	return result, nil
 }

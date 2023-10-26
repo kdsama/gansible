@@ -1,6 +1,6 @@
 ---
 - name: example playbook
-  hosts: localhost
+  hosts: localhost,brocode
 
   tasks:
     - name: Ensure a line is present in a file

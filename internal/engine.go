@@ -2,6 +2,7 @@ package internal
 
 import (
 	"fmt"
+	"strings"
 	"sync"
 
 	"golang.org/x/crypto/ssh"
@@ -40,10 +41,9 @@ func (e *Engine) Run() {
 	wg := sync.WaitGroup{}
 	for i := range e.playbook.Plays {
 		respObj := e.playbook.Generate(i)
-		fmt.Println(respObj.hosts)
+
 		for _, h := range respObj.hosts {
 			obj := e.inventory.inv.All.Hosts[h]
-			fmt.Println("Obj is ", obj)
 			cache[h] = NewLogin(obj.AnsibleHost, obj.AnsibleUser, obj.AnsibleSshPass, "", obj.AnsiblePort)
 		}
 		for _, t := range respObj.tasks {
@@ -54,13 +54,20 @@ func (e *Engine) Run() {
 				go func() {
 					defer wg.Done()
 					for _, c := range t.cmds {
-						execute(cache[h], c)
+						o := execute(cache[h], c)
+						// fmt.Println("O ERROR", o.Err, strings.Trim(o.Err, " "))
+						if strings.Trim(o.Err, " ") != "" {
+							fmt.Println("What ?????")
+
+						}
+
 					}
 
 				}()
 			}
+			fmt.Println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
 			wg.Wait()
-			fmt.Println("Finished")
+
 		}
 	}
 }

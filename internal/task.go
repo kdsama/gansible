@@ -23,7 +23,7 @@ func parseTask(task map[string]interface{}) (*Task, error) {
 		switch key {
 		// case "copy":
 		// 	res = modules.NewCopy(task[key].(map[string]interface{}))
-		case "lineinfile":
+		case LineinfileMod:
 			cmds, err := modules.NewLineInFile(task[key].(map[string]interface{}))
 			if err != nil {
 				return result, err
@@ -32,7 +32,7 @@ func parseTask(task map[string]interface{}) (*Task, error) {
 				cmds: cmds,
 				os:   "any",
 			}
-		case "file":
+		case fileMod:
 			cmds, err := modules.NewFilePermissions(task[key].(map[string]interface{}))
 			if err != nil {
 				return result, err
@@ -41,7 +41,7 @@ func parseTask(task map[string]interface{}) (*Task, error) {
 				cmds: cmds,
 				os:   "any",
 			}
-		case "user":
+		case userMod:
 			cmds, err := modules.NewUser(task[key].(map[string]interface{}))
 			if err != nil {
 				return result, err
@@ -50,7 +50,7 @@ func parseTask(task map[string]interface{}) (*Task, error) {
 				cmds: cmds,
 				os:   "any",
 			}
-		case "shell":
+		case shellMod:
 			cmds, err := modules.NewShell(task[key].(map[string]interface{}))
 			if err != nil {
 				return result, err

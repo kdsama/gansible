@@ -1,7 +1,6 @@
 package internal
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"strings"
@@ -80,7 +79,6 @@ func (pb *PlayBook) Generate(index int) Document {
 	for _, task := range pb.Plays[index].Tasks {
 		t, err := parseTask(task)
 		if err != nil || t == nil {
-			fmt.Printf("Error %v \n", err)
 			continue
 		}
 		fn = append(fn, t)
