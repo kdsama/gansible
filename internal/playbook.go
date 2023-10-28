@@ -51,31 +51,6 @@ type Document struct {
 }
 
 func (pb *PlayBook) Generate(index int) Document {
-
-	// Here there is another mistake
-	// The task may or may not be appended according to module being used.
-	// YOu forgot about it didnt you.
-	// Think what you need to do , and go drink water
-	// so I have an idea
-	// We are going to gather facts at the start of each play anyway
-	// So there is no trouble tbf
-	// The thing is
-	// We already have a command
-	// How are we going to skip an execution
-	// Now this becomes our problem
-	// Maybe what we can do is provide playbook with facts first
-	// Thats not right
-	// Or we should return OS information alongside tasks
-	// There can be an enumeration for that
-	// If OS matches, only then we should process it, or we should skip
-	// But what if we want to actually skip in case of where clause
-	// We can add another field for that
-	// But that field is not exclusive to just server skipping, it can be anycondition
-	// Should I not consider the where clause ?
-	// Lets do that , Lets skip the where clause
-	// Now there is another concern
-	// We would also have to return the hosts we must run this on
-	// Lets first gather everything
 	hosts := strings.Split(pb.Plays[index].Hosts, ",")
 	fn := []*Task{}
 	for _, task := range pb.Plays[index].Tasks {

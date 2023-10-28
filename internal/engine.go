@@ -62,7 +62,6 @@ func (e *Engine) LinearStrategy(i int) {
 			obj := e.inventory.inv.All.Hosts[h]
 			e.sshService.add(h, obj.SshHost, obj.SshUser, obj.SshPass, "", obj.SshPort)
 		}
-
 	}
 	for k := 0; k < len(respObj.hosts)/e.maxConcurrent; k += e.maxConcurrent {
 		start, end := k*e.maxConcurrent, ((k + 1) * e.maxConcurrent)
