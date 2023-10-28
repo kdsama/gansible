@@ -9,7 +9,7 @@ type Engine struct {
 	playbook      *PlayBook
 	maxConcurrent int
 	wg            *sync.WaitGroup
-	sshCache      map[string]*sshConn
+	sshService    ssher
 }
 
 func NewEngine(playbookPath string, hostPath string) *Engine {
@@ -32,7 +32,7 @@ func NewEngine(playbookPath string, hostPath string) *Engine {
 		playbook:      pb,
 		maxConcurrent: 10,
 		wg:            &sync.WaitGroup{},
-		sshCache:      map[string]*sshConn{},
+		sshService:    NewSSHService(),
 	}
 }
 
@@ -58,20 +58,12 @@ func (e *Engine) LinearStrategy(i int) {
 		e.maxConcurrent = e.playbook.Plays[i].Serial
 	}
 	for _, h := range respObj.hosts {
-		if _, ok := e.sshCache[h]; ok {
+		if _, ok := e.sshService.get(h); ok {
 			obj := e.inventory.inv.All.Hosts[h]
-			e.sshCache[h] = NewSshConn(obj.AnsibleHost, obj.AnsibleUser, obj.AnsibleSshPass, "", obj.AnsiblePort)
+			e.sshService.add(h, obj.sshHost, obj.sshUser, obj.sshPass, "", obj.sshPort)
 		}
 
 	}
-	// So  I need to run this with x concurrency
-	// If its length is less than x, we run as is
-	// Else,
-	// lets say we have 22
-	// 0 to 10 , 11 to 20, 21 to 22
-	// 0:11
-	//11:21
-	//21:22
 	for k := 0; k < len(respObj.hosts)/e.maxConcurrent; k += e.maxConcurrent {
 		start, end := k*e.maxConcurrent, ((k + 1) * e.maxConcurrent)
 		if end > len(respObj.hosts) {
@@ -86,7 +78,7 @@ func (e *Engine) LinearStrategy(i int) {
 				go func() {
 					defer wg.Done()
 					for _, c := range t.cmds {
-						e.sshCache[h].execute(c)
+						e.sshService.execute(h, c)
 					}
 
 				}()
@@ -106,7 +98,7 @@ func (e *Engine) FreeStrategy(i int) {
 	}
 	for _, h := range respObj.hosts {
 		obj := e.inventory.inv.All.Hosts[h]
-		e.sshCache[h] = NewSshConn(obj.AnsibleHost, obj.AnsibleUser, obj.AnsibleSshPass, "", obj.AnsiblePort)
+		e.sshService.add(h, obj.sshHost, obj.sshUser, obj.sshPass, "", obj.sshPort)
 	}
 	wg.Add(len(respObj.hosts))
 	for k := 0; k < len(respObj.hosts)/e.maxConcurrent; k += e.maxConcurrent {
@@ -121,7 +113,7 @@ func (e *Engine) FreeStrategy(i int) {
 				for _, t := range respObj.tasks {
 					h := h
 					for _, c := range t.cmds {
-						e.sshCache[h].execute(c)
+						e.sshService.execute(h, c)
 					}
 
 				}

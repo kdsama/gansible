@@ -8,6 +8,31 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
+type ssher interface {
+	add(name, host, user, pw, pkey string, port int)
+	get(name string) (*sshConn, bool)
+	execute(name string, cmd string) ExecOutput
+}
+
+type sshService map[string]*sshConn
+
+func NewSSHService() *sshService {
+
+	return new(sshService)
+}
+
+func (ss *sshService) add(name, host, user, pw, pkey string, port int) {
+	conn := NewSshConn(host, user, pw, pkey, port)
+	(*ss)[name] = conn
+}
+func (ss *sshService) get(name string) (*sshConn, bool) {
+	val, ok := (*ss)[name]
+	return val, ok
+}
+func (ss *sshService) execute(name string, cmd string) ExecOutput {
+	return (*ss)[name].execute(cmd)
+}
+
 type sshConn struct {
 	host   string
 	user   string

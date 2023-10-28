@@ -9,10 +9,10 @@ import (
 )
 
 type Host struct {
-	AnsibleHost    string `yaml:"ansible_host"`
-	AnsibleUser    string `yaml:"ansible_user"`
-	AnsibleSshPass string `yaml:"ansible_ssh_pass"`
-	AnsiblePort    int    `yaml:"ansible_ssh_port"`
+	sshHost string `yaml:"ansible_host"`
+	sshUser string `yaml:"ansible_user"`
+	sshPass string `yaml:"ansible_ssh_pass"`
+	sshPort int    `yaml:"ansible_ssh_port"`
 }
 type MainInventory struct {
 	inv   *Inventory
