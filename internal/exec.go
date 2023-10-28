@@ -36,5 +36,6 @@ func (sc *sshConn) execute(cmd string) ExecOutput {
 		Err: sshErr.String(),
 		Cmd: cmd,
 	}
+
 	return co
 }

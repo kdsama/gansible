@@ -6,8 +6,9 @@ import (
 )
 
 type Engine struct {
-	inventory *MainInventory
-	playbook  *PlayBook
+	inventory     *MainInventory
+	playbook      *PlayBook
+	maxConcurrent int
 }
 
 func NewEngine(playbookPath string, hostPath string) *Engine {
@@ -26,8 +27,9 @@ func NewEngine(playbookPath string, hostPath string) *Engine {
 	pb = NewPlaybook(playbookPath)
 
 	return &Engine{
-		inventory: inventory,
-		playbook:  pb,
+		inventory:     inventory,
+		playbook:      pb,
+		maxConcurrent: 10,
 	}
 }
 
@@ -55,11 +57,21 @@ func (e *Engine) LinearStrategy(i int, cache map[string]*sshConn) {
 		obj := e.inventory.inv.All.Hosts[h]
 		cache[h] = NewSshConn(obj.AnsibleHost, obj.AnsibleUser, obj.AnsibleSshPass, "", obj.AnsiblePort)
 	}
+	// So  I need to run this with x concurrency
+	// If its length is less than x, we run as is
+	// Else,
+	// lets say we have 22
+	// 0 to 10 , 11 to 20, 21 to 22
+	// 0:11
+	//11:21
+	//21:22
+
 	for _, t := range respObj.tasks {
 		wg.Add(len(respObj.hosts))
 
 		for _, h := range respObj.hosts {
 			h := h
+			t := t
 			go func() {
 				defer wg.Done()
 				for _, c := range t.cmds {
@@ -68,38 +80,42 @@ func (e *Engine) LinearStrategy(i int, cache map[string]*sshConn) {
 
 			}()
 		}
-		fmt.Println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-		wg.Wait()
-
 	}
+
+	fmt.Println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+	wg.Wait()
+
 }
 
 func (e *Engine) FreeStrategy(i int, cache map[string]*sshConn) {
-	fmt.Println("Free Strategy Start")
 	wg := sync.WaitGroup{}
 	respObj := e.playbook.Generate(i)
-
+	if e.playbook.Plays[i].Serial > 0 {
+		e.maxConcurrent = e.playbook.Plays[i].Serial
+	}
 	for _, h := range respObj.hosts {
 		obj := e.inventory.inv.All.Hosts[h]
 		cache[h] = NewSshConn(obj.AnsibleHost, obj.AnsibleUser, obj.AnsibleSshPass, "", obj.AnsiblePort)
 	}
 	wg.Add(len(respObj.hosts))
-	for _, h := range respObj.hosts {
-		h := h
-		go func() {
-			defer func() {
-				fmt.Println("Host", h, "Finished")
-				wg.Done()
-			}()
-			for _, t := range respObj.tasks {
-				h := h
-				for _, c := range t.cmds {
-					cache[h].execute(c)
-				}
+	for k := 0; k < len(respObj.hosts)/e.maxConcurrent; k += e.maxConcurrent {
+		start, end := k*e.maxConcurrent, ((k + 1) * e.maxConcurrent)
+		if end > len(respObj.hosts) {
+			end = len(respObj.hosts)
+		}
+		for _, h := range respObj.hosts[start:end] {
+			h := h
+			go func() {
+				defer wg.Done()
+				for _, t := range respObj.tasks {
+					h := h
+					for _, c := range t.cmds {
+						cache[h].execute(c)
+					}
 
-			}
-		}()
+				}
+			}()
+		}
 	}
 	wg.Wait()
-	fmt.Println("Free Strategy ENd ---------------------------------------------------------")
 }
