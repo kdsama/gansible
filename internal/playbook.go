@@ -15,7 +15,7 @@ type PlayBook struct {
 type Play struct {
 	Name     string                   `yaml:"name"`
 	Hosts    string                   `yaml:"hosts"`
-	Tasks    []map[string]interface{} `yaml:"tasks,hundo"`
+	Tasks    []map[string]interface{} `yaml:"tasks"`
 	Strategy string                   `yaml:"strategy"`
 	Serial   int                      `yaml:"serial"`
 }

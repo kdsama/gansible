@@ -2,7 +2,7 @@
 - name: example playbook
   hosts: server1,server2,server3,server4
   strategy: free
-  hundo:
+  tasks:
     - name: Create a group
       group:
         name: yourgroup

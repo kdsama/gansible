@@ -18,7 +18,7 @@ type sshService map[string]*sshConn
 
 func NewSSHService() *sshService {
 
-	return new(sshService)
+	return &sshService{}
 }
 
 func (ss *sshService) add(name, host, user, pw, pkey string, port int) {
@@ -47,7 +47,6 @@ func NewSshConn(host, user, pw, pkey string, port int) *sshConn {
 	if port == 0 {
 		port = 22
 	}
-	fmt.Println("Port is", port)
 	lg := &sshConn{
 		host: host,
 		user: user,

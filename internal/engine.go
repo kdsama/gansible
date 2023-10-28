@@ -60,7 +60,7 @@ func (e *Engine) LinearStrategy(i int) {
 	for _, h := range respObj.hosts {
 		if _, ok := e.sshService.get(h); ok {
 			obj := e.inventory.inv.All.Hosts[h]
-			e.sshService.add(h, obj.sshHost, obj.sshUser, obj.sshPass, "", obj.sshPort)
+			e.sshService.add(h, obj.SshHost, obj.SshUser, obj.SshPass, "", obj.SshPort)
 		}
 
 	}
@@ -98,27 +98,25 @@ func (e *Engine) FreeStrategy(i int) {
 	}
 	for _, h := range respObj.hosts {
 		obj := e.inventory.inv.All.Hosts[h]
-		e.sshService.add(h, obj.sshHost, obj.sshUser, obj.sshPass, "", obj.sshPort)
+		e.sshService.add(h, obj.SshHost, obj.SshUser, obj.SshPass, "", obj.SshPort)
 	}
 	wg.Add(len(respObj.hosts))
-	for k := 0; k < len(respObj.hosts)/e.maxConcurrent; k += e.maxConcurrent {
-		start, end := k*e.maxConcurrent, ((k + 1) * e.maxConcurrent)
-		if end > len(respObj.hosts) {
-			end = len(respObj.hosts)
-		}
-		for _, h := range respObj.hosts[start:end] {
-			h := h
-			go func() {
-				defer wg.Done()
-				for _, t := range respObj.tasks {
-					h := h
-					for _, c := range t.cmds {
-						e.sshService.execute(h, c)
-					}
+	for _, h := range respObj.hosts {
+		h := h
+		go func() {
+			defer wg.Done()
+			for _, t := range respObj.tasks {
+				h := h
 
+				for _, c := range t.cmds {
+
+					e.sshService.execute(h, c)
 				}
-			}()
-		}
+
+			}
+		}()
 	}
+
 	wg.Wait()
+
 }

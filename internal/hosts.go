@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"strings"
@@ -9,10 +10,10 @@ import (
 )
 
 type Host struct {
-	sshHost string `yaml:"ansible_host"`
-	sshUser string `yaml:"ansible_user"`
-	sshPass string `yaml:"ansible_ssh_pass"`
-	sshPort int    `yaml:"ansible_ssh_port"`
+	SshHost string `yaml:"ansible_host"`
+	SshUser string `yaml:"ansible_user"`
+	SshPass string `yaml:"ansible_ssh_pass"`
+	SshPort int    `yaml:"ansible_ssh_port"`
 }
 type MainInventory struct {
 	inv   *Inventory
@@ -58,7 +59,9 @@ func NewInventory(invOpts ...InventoryOpts) *MainInventory {
 		// }
 		var inventory Inventory
 		err := yaml.Unmarshal(yamlData, &inventory)
+		fmt.Printf("Inventory is %+v", inventory)
 		if err != nil {
+
 			log.Fatal(err)
 		}
 		if mainInv.inv == nil {
