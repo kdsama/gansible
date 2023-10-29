@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"fmt"
 	"sync"
 )
 
@@ -38,6 +39,7 @@ func NewEngine(playbookPath string, hostPath string) *Engine {
 
 func (e *Engine) Run() {
 	// os := "ubuntu"
+	fmt.Println(e.playbook.Plays)
 
 	for i := range e.playbook.Plays {
 		// fmt.Println("O ERROR", o.Err, strings.Trim(o.Err, " "))
@@ -63,6 +65,7 @@ func (e *Engine) LinearStrategy(i int) {
 			e.sshService.add(h, obj.SshHost, obj.SshUser, obj.SshPass, "", obj.SshPort)
 		}
 	}
+	opts := []ExecOutput{}
 	for k := 0; k < len(respObj.hosts)/e.maxConcurrent; k += e.maxConcurrent {
 		start, end := k*e.maxConcurrent, ((k + 1) * e.maxConcurrent)
 		if end > len(respObj.hosts) {
@@ -77,7 +80,8 @@ func (e *Engine) LinearStrategy(i int) {
 				go func() {
 					defer wg.Done()
 					for _, c := range t.cmds {
-						e.sshService.execute(h, c)
+						fmt.Println(c)
+						opts = append(opts, e.sshService.execute(h, c))
 					}
 
 				}()
@@ -86,7 +90,7 @@ func (e *Engine) LinearStrategy(i int) {
 	}
 
 	wg.Wait()
-
+	fmt.Println(opts, "???")
 }
 
 func (e *Engine) FreeStrategy(i int) {
@@ -100,6 +104,7 @@ func (e *Engine) FreeStrategy(i int) {
 		e.sshService.add(h, obj.SshHost, obj.SshUser, obj.SshPass, "", obj.SshPort)
 	}
 	wg.Add(len(respObj.hosts))
+	opts := []ExecOutput{}
 	for _, h := range respObj.hosts {
 		h := h
 		go func() {
@@ -109,7 +114,8 @@ func (e *Engine) FreeStrategy(i int) {
 
 				for _, c := range t.cmds {
 
-					e.sshService.execute(h, c)
+					fmt.Println(c)
+					opts = append(opts, e.sshService.execute(h, c))
 				}
 
 			}
@@ -117,5 +123,6 @@ func (e *Engine) FreeStrategy(i int) {
 	}
 
 	wg.Wait()
+	fmt.Println(opts)
 
 }
