@@ -80,7 +80,6 @@ func (e *Engine) LinearStrategy(i int) {
 				go func() {
 					defer wg.Done()
 					for _, c := range t.cmds {
-						fmt.Println(c)
 						opts = append(opts, e.sshService.execute(h, c))
 					}
 
@@ -90,7 +89,7 @@ func (e *Engine) LinearStrategy(i int) {
 	}
 
 	wg.Wait()
-	fmt.Println(opts, "???")
+
 }
 
 func (e *Engine) FreeStrategy(i int) {
@@ -123,6 +122,5 @@ func (e *Engine) FreeStrategy(i int) {
 	}
 
 	wg.Wait()
-	fmt.Println(opts)
 
 }

@@ -7,8 +7,10 @@ import (
 )
 
 type Task struct {
-	cmds []string
-	os   string
+	name        string
+	cmds        []string
+	os          string
+	skip_errors bool
 }
 
 func parseTask(task map[string]interface{}) (*Task, error) {
@@ -18,7 +20,7 @@ func parseTask(task map[string]interface{}) (*Task, error) {
 		}
 	}()
 	// TODO: Work the other task level variables that may be present
-	var result *Task
+	var result = &Task{}
 	for key, _ := range task {
 		switch key {
 		// case "copy":
@@ -28,38 +30,30 @@ func parseTask(task map[string]interface{}) (*Task, error) {
 			if err != nil {
 				return result, err
 			}
-			result = &Task{
-				cmds: cmds,
-				os:   "any",
-			}
+			result.cmds = cmds
+
 		case fileMod:
 			cmds, err := modules.NewFilePermissions(task[key].(map[string]interface{}))
 			if err != nil {
 				return result, err
 			}
-			result = &Task{
-				cmds: cmds,
-				os:   "any",
-			}
+			result.cmds = cmds
 		case userMod:
 			cmds, err := modules.NewUser(task[key].(map[string]interface{}))
 			if err != nil {
 				return result, err
 			}
-			result = &Task{
-				cmds: cmds,
-				os:   "any",
-			}
+			result.cmds = cmds
 		case shellMod:
 			cmds, err := modules.NewShell(task[key].(map[string]interface{}))
 			if err != nil {
 				return result, err
 			}
-			result = &Task{
-				cmds: cmds,
-				os:   "any",
-			}
-
+			result.cmds = cmds
+		case "skip_errors":
+			result.skip_errors = true
+		case "name":
+			result.name = task[key].(string)
 		case "default":
 			fmt.Println(key)
 		}

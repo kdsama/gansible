@@ -102,8 +102,8 @@ func TestParseTask(t *testing.T) {
 				},
 			},
 			want: []*Task{
-				{[]string{fmt.Sprintf("echo \"%s\" >> %s", dummyLine, dummyPath)}, "any"},
-				{[]string{fmt.Sprintf("useradd %s", "kd"), fmt.Sprintf("passwd -u %s", "kd"), fmt.Sprintf("mkdir /home/%s", "kd"), fmt.Sprintf("chown %s:%s /home/%s", "kd", "kd", "kd")}, "any"},
+				{cmds: []string{fmt.Sprintf("echo \"%s\" >> %s", dummyLine, dummyPath)}, os: "any"},
+				{cmds: []string{fmt.Sprintf("useradd %s", "kd"), fmt.Sprintf("passwd -u %s", "kd"), fmt.Sprintf("mkdir /home/%s", "kd"), fmt.Sprintf("chown %s:%s /home/%s", "kd", "kd", "kd")}, os: "any"},
 			},
 		},
 	}
