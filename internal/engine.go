@@ -2,6 +2,7 @@ package internal
 
 import (
 	"fmt"
+	"strings"
 	"sync"
 )
 
@@ -38,33 +39,23 @@ func NewEngine(playbookPath string, hostPath string) *Engine {
 }
 
 func (e *Engine) Run() {
-	// os := "ubuntu"
-	fmt.Println(e.playbook.Plays)
 
 	for i := range e.playbook.Plays {
-		// fmt.Println("O ERROR", o.Err, strings.Trim(o.Err, " "))
+
+		respObj := e.prepareTasks(i)
+
 		switch e.playbook.Plays[i].Strategy {
 		case "free":
-			e.FreeStrategy(i)
+			e.FreeStrategy(respObj)
 		default:
-			e.LinearStrategy(i)
+			e.LinearStrategy(respObj)
 		}
 
 	}
 }
 
-func (e *Engine) LinearStrategy(i int) {
-	wg := sync.WaitGroup{}
-	respObj := e.playbook.Generate(i)
-	if e.playbook.Plays[i].Serial > 0 {
-		e.maxConcurrent = e.playbook.Plays[i].Serial
-	}
-	for _, h := range respObj.hosts {
-		if _, ok := e.sshService.get(h); ok {
-			obj := e.inventory.inv.All.Hosts[h]
-			e.sshService.add(h, obj.SshHost, obj.SshUser, obj.SshPass, "", obj.SshPort)
-		}
-	}
+func (e *Engine) LinearStrategy(respObj PlayDoc) {
+
 	opts := []ExecOutput{}
 	for k := 0; k < len(respObj.hosts)/e.maxConcurrent; k += e.maxConcurrent {
 		start, end := k*e.maxConcurrent, ((k + 1) * e.maxConcurrent)
@@ -72,15 +63,27 @@ func (e *Engine) LinearStrategy(i int) {
 			end = len(respObj.hosts)
 		}
 		for _, t := range respObj.tasks {
-			wg.Add(len(respObj.hosts))
+			e.wg.Add(len(respObj.hosts))
 
 			for _, h := range respObj.hosts[start:end] {
 				h := h
 				t := t
+				if !e.sameOS(t, h) {
+					continue
+				}
 				go func() {
-					defer wg.Done()
+					defer e.wg.Done()
 					for _, c := range t.cmds {
-						opts = append(opts, e.sshService.execute(h, c))
+						res, err := e.sshService.execute(h, c)
+						if err != nil {
+							fmt.Println("Needs to be skipped")
+							continue
+						}
+						if strings.Trim(res.Err, " ") != "" && !t.skip_errors {
+
+							break
+						}
+						opts = append(opts, res)
 					}
 
 				}()
@@ -88,12 +91,52 @@ func (e *Engine) LinearStrategy(i int) {
 		}
 	}
 
-	wg.Wait()
+	e.wg.Wait()
 
 }
 
-func (e *Engine) FreeStrategy(i int) {
-	wg := sync.WaitGroup{}
+func (e *Engine) FreeStrategy(respObj PlayDoc) {
+
+	e.wg.Add(len(respObj.hosts))
+	opts := []ExecOutput{}
+	for _, h := range respObj.hosts {
+		h := h
+		go func() {
+			defer e.wg.Done()
+			for _, t := range respObj.tasks {
+				h := h
+				if !e.sameOS(t, h) {
+					continue
+				}
+
+				for _, c := range t.cmds {
+					res, err := e.sshService.execute(h, c)
+					if err != nil {
+						fmt.Println("Needs to be skipped")
+						continue
+					}
+					if strings.Trim(res.Err, " ") != "" && !t.skip_errors {
+						break
+					}
+					opts = append(opts, res)
+				}
+
+			}
+		}()
+	}
+
+	e.wg.Wait()
+
+}
+
+func (e *Engine) sameOS(t *Task, h string) bool {
+	if t.os != "any" && t.os != strings.ToLower(e.sshService.getOS(h)) {
+		return false
+	}
+	return true
+}
+
+func (e *Engine) prepareTasks(i int) PlayDoc {
 	respObj := e.playbook.Generate(i)
 	if e.playbook.Plays[i].Serial > 0 {
 		e.maxConcurrent = e.playbook.Plays[i].Serial
@@ -102,25 +145,5 @@ func (e *Engine) FreeStrategy(i int) {
 		obj := e.inventory.inv.All.Hosts[h]
 		e.sshService.add(h, obj.SshHost, obj.SshUser, obj.SshPass, "", obj.SshPort)
 	}
-	wg.Add(len(respObj.hosts))
-	opts := []ExecOutput{}
-	for _, h := range respObj.hosts {
-		h := h
-		go func() {
-			defer wg.Done()
-			for _, t := range respObj.tasks {
-				h := h
-
-				for _, c := range t.cmds {
-
-					fmt.Println(c)
-					opts = append(opts, e.sshService.execute(h, c))
-				}
-
-			}
-		}()
-	}
-
-	wg.Wait()
-
+	return respObj
 }

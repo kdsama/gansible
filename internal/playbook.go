@@ -45,12 +45,12 @@ func NewPlaybook(playbookPath string) *PlayBook {
 	}
 }
 
-type Document struct {
+type PlayDoc struct {
 	hosts []string
 	tasks []*Task
 }
 
-func (pb *PlayBook) Generate(index int) Document {
+func (pb *PlayBook) Generate(index int) PlayDoc {
 	hosts := strings.Split(pb.Plays[index].Hosts, ",")
 	fn := []*Task{}
 	for _, task := range pb.Plays[index].Tasks {
@@ -60,7 +60,7 @@ func (pb *PlayBook) Generate(index int) Document {
 		}
 		fn = append(fn, t)
 	}
-	return Document{
+	return PlayDoc{
 		hosts: hosts,
 		tasks: fn,
 	}

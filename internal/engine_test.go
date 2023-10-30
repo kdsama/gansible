@@ -17,12 +17,16 @@ func (ms *mockSshService) get(name string) (*sshConn, bool) {
 	return nil, true
 }
 
-func (ms *mockSshService) execute(name string, cmd string) ExecOutput {
+func (ms *mockSshService) getOS(name string) string {
+	return "any"
+}
+
+func (ms *mockSshService) execute(name string, cmd string) (ExecOutput, error) {
 	return ExecOutput{
 		Cmd: fmt.Sprintf("cmd %s", name),
 		Out: name,
 		Err: "",
-	}
+	}, nil
 }
 func testSetupEngine() *Engine {
 	eg := Engine{}

@@ -1,8 +1,11 @@
 package internal
 
 import (
+	"errors"
 	"fmt"
+	"log"
 	"os"
+	"strings"
 
 	"github.com/fatih/color"
 	"golang.org/x/crypto/ssh"
@@ -11,7 +14,8 @@ import (
 type ssher interface {
 	add(name, host, user, pw, pkey string, port int)
 	get(name string) (*sshConn, bool)
-	execute(name string, cmd string) ExecOutput
+	getOS(name string) string
+	execute(name string, cmd string) (ExecOutput, error)
 }
 
 type sshService map[string]*sshConn
@@ -29,12 +33,21 @@ func (ss *sshService) get(name string) (*sshConn, bool) {
 	val, ok := (*ss)[name]
 	return val, ok
 }
-func (ss *sshService) execute(name string, cmd string) ExecOutput {
-	return (*ss)[name].execute(cmd)
+
+func (ss *sshService) getOS(name string) string {
+	val := (*ss)[name]
+	return val.os
+}
+func (ss *sshService) execute(name string, cmd string) (ExecOutput, error) {
+	if _, ok := (*ss)[name]; !ok {
+		return ExecOutput{}, errors.New("host not applicable")
+	}
+	return (*ss)[name].execute(cmd), nil
 }
 
 type sshConn struct {
 	host   string
+	os     string
 	user   string
 	pw     string
 	pkey   string
@@ -57,6 +70,7 @@ func NewSshConn(host, user, pw, pkey string, port int) *sshConn {
 	}
 	client := lg.Ping()
 	lg.client = client
+	lg.SetOSEnvironment()
 	return lg
 }
 
@@ -80,4 +94,14 @@ func (lg *sshConn) Ping() *ssh.Client {
 	d := color.New(color.FgCyan, color.Bold)
 	d.Println("Successful Connection")
 	return client
+}
+
+func (lg *sshConn) SetOSEnvironment() {
+	res := lg.execute(`cat /etc/os-release | grep PRETTY_NAME | cut -d= -f2 | cut -d\" -f2 | awk '{print $1}'`)
+	if res.Err != "" {
+		log.Fatal("Cannot get host information-->", strings.Trim(res.Err, " "))
+	}
+
+	lg.os = res.Out
+	fmt.Println("OS IS ", lg.os)
 }

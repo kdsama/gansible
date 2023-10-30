@@ -9,8 +9,8 @@ import (
 type Task struct {
 	name        string
 	cmds        []string
-	os          string
 	skip_errors bool
+	os          string
 }
 
 func parseTask(task map[string]interface{}) (*Task, error) {
@@ -21,6 +21,7 @@ func parseTask(task map[string]interface{}) (*Task, error) {
 	}()
 	// TODO: Work the other task level variables that may be present
 	var result = &Task{}
+	result.os = "any"
 	for key, _ := range task {
 		switch key {
 		// case "copy":
@@ -38,6 +39,7 @@ func parseTask(task map[string]interface{}) (*Task, error) {
 				return result, err
 			}
 			result.cmds = cmds
+
 		case userMod:
 			cmds, err := modules.NewUser(task[key].(map[string]interface{}))
 			if err != nil {
