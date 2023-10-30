@@ -103,5 +103,5 @@ func (lg *sshConn) SetOSEnvironment() {
 	}
 
 	lg.os = res.Out
-	fmt.Println("OS IS ", lg.os)
+
 }

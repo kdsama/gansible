@@ -43,7 +43,6 @@ func (e *Engine) Run() {
 	for i := range e.playbook.Plays {
 
 		respObj := e.prepareTasks(i)
-
 		switch e.playbook.Plays[i].Strategy {
 		case "free":
 			e.FreeStrategy(respObj)
@@ -75,8 +74,9 @@ func (e *Engine) LinearStrategy(respObj PlayDoc) {
 					defer e.wg.Done()
 					for _, c := range t.cmds {
 						res, err := e.sshService.execute(h, c)
+
 						if err != nil {
-							fmt.Println("Needs to be skipped")
+
 							continue
 						}
 						if strings.Trim(res.Err, " ") != "" && !t.skip_errors {
@@ -92,6 +92,7 @@ func (e *Engine) LinearStrategy(respObj PlayDoc) {
 	}
 
 	e.wg.Wait()
+	fmt.Println(opts)
 
 }
 
@@ -111,14 +112,15 @@ func (e *Engine) FreeStrategy(respObj PlayDoc) {
 
 				for _, c := range t.cmds {
 					res, err := e.sshService.execute(h, c)
+					fmt.Println("Response is ", res)
 					if err != nil {
-						fmt.Println("Needs to be skipped")
 						continue
 					}
 					if strings.Trim(res.Err, " ") != "" && !t.skip_errors {
 						break
 					}
 					opts = append(opts, res)
+
 				}
 
 			}
@@ -126,6 +128,7 @@ func (e *Engine) FreeStrategy(respObj PlayDoc) {
 	}
 
 	e.wg.Wait()
+	fmt.Println(opts)
 
 }
 

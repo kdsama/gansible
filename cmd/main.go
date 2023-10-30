@@ -1,11 +1,21 @@
 package main
 
-import "github.com/kdsama/gansible/internal"
+import (
+	"flag"
+
+	"github.com/kdsama/gansible/internal"
+)
 
 // "golang.org/x/crypto/ssh"
 
 func main() {
 
-	engine := internal.NewEngine("./pb.yml", "")
+	var (
+		inventory = flag.String("i", "", "inventory file for executing the playbook ")
+		playbook  = flag.String("p", "", "Playbook to run ")
+	)
+	flag.Parse()
+
+	engine := internal.NewEngine(*playbook, *inventory)
 	engine.Run()
 }

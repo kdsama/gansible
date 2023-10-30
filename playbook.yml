@@ -7,6 +7,7 @@
       group:
         name: yourgroup
         state: present  
+      skip_errors: true
       
     - name: Create a user
       user:
@@ -15,4 +16,4 @@
         groups: yourgroup    
         state: present       
         shell: /bin/bash     
-      
+      skip_errors: true
